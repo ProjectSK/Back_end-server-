@@ -1,0 +1,5 @@
+DATABASE_USERNAME = 'root'
+DATABASE_PASSWORD = 'password here'
+DATABASE_NAME = 'd'
+
+
