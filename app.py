@@ -47,11 +47,24 @@ def post_battery():
 def show_columns(selector, deviceId, limit, mand_cols):
     c = db.cursor()
     result = []
+    result.append("<div class='container'>");
+    result.append("<table class='table table-striped'>")
+    result.append('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"> <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">')
+    result.append("<thead><tr>")
+    for col in mand_cols:
+        result.append("<th>")
+        result.append(col)
+        result.append("</th>")
+    result.append("</tr></thead>")
     for record in selector(c, deviceId, limit):
+        result.append("<tr>")
         for col in mand_cols:
+            result.append("<td>")
             result.append(str(record[col]))
-            result.append(" ")
-        result.append("\n")
+            result.append("</td>")
+        result.append("</tr>")
+    result.append("</table>")
+    result.append("</div>")
     return "".join(result)
 
 

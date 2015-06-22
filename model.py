@@ -55,6 +55,8 @@ def insert_location(cursor, deviceId, loc):
 
 
 def insert_battery(cursor, deviceId, battery):
+    if "healthType" not in battery:
+        print battery
     cursor.execute("INSERT INTO battery (deviceId, time, capacity, level, scale, voltage, temperature, healthType, plugType) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE deviceId = deviceId", (deviceId, battery["time"], battery["capacity"], battery["level"], battery["scale"], battery["voltage"], battery["temperature"], battery["healthType"], battery["plugType"]))
 
 
