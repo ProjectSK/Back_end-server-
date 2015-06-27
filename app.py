@@ -68,24 +68,35 @@ def show_columns(selector, deviceId, limit, mand_cols):
     result.append("</div>")
     return "".join(result)
 
-def get_data(selector,deviceId,limit, date, info):
+def get_data_appUsage(selector,deviceId,limit, name, infos):
     c=db.cursor()
     retVal={}
     result=[]
-    temp=[]
-    for record in selector(c,deviceId,limit):
-        temp.append(record[info])
-    maxVal=max(temp)
     for record in selector(c,deviceId,limit):
         data={}
-        data["date"]=str(record[date])
-        data["percentage"]=str(record[info]*100/maxVal)
+        data["name"]=str(record[name])
+        for info in infos:
+            data[info]=str(record[info])
         result.append((data))
-    retVal["yaxisDesc"]="Percentage (%)"
+    retVal["yaxisDesc"]="ElapsedTime"
     retVal["data"]=result
     return retVal
 
-def get_loc(deviceId,limit):
+def get_data_battery(selector,deviceId,limit, date, infos):
+    c=db.cursor()
+    retVal={}
+    result=[]
+    for record in selector(c,deviceId,limit):
+        data={}
+        data["date"]=str(record[date])
+        for info in infos:
+            data[info]=str(record[info])
+        result.append((data))
+    retVal["yaxisDesc"]="Percentage (%) || Temperature (C)"
+    retVal["data"]=result
+    return retVal
+
+def get_data_loc(deviceId,limit):
     c=db.cursor()
     result=[]
     for record in model.select_location(c,deviceId,limit):
@@ -98,15 +109,16 @@ def get_loc(deviceId,limit):
 
 @app.route("/location/<deviceId>", methods=["GET"])
 def show_locations(deviceId):
-    return show_columns(model.select_location, deviceId, 20, ["time", "lat", "lng"])+render_template("Location.html",Latlngs=get_loc(deviceId,20))
+    return show_columns(model.select_location, deviceId, 20, ["time", "lat", "lng"])+render_template("Location.html",Latlngs=get_data_loc(deviceId,20))
 
 @app.route("/battery/<deviceId>", methods=["GET"])
 def show_battery(deviceId):
-    return show_columns(model.select_battery, deviceId, 20, ["time", "capacity", "level", "scale", "voltage", "temperature", "healthType", "plugType"])+render_template("data.html",info=get_data(model.select_battery,deviceId,20,"time","capacity"))
+    return render_template("battery.html",info=get_data_battery(model.select_battery,deviceId,20,"time",["capacity","temperature"]))  +  show_columns(model.select_battery, deviceId, 20, ["time", "capacity", "level", "scale", "voltage", "temperature", "healthType", "plugType"])
 
 @app.route("/appUsage/<deviceId>", methods=["GET"])
 def show_appUsage(deviceId):
-    return show_columns(model.select_appUsage, deviceId, 20, ["packageName", "startTime", "elapsedTime"])+render_template("data.html",info=get_data(model.select_appUsage,deviceId,20,"startTime","elapsedTime"))
+    return show_columns(model.select_appUsage, deviceId, 20, ["packageName", "startTime", "elapsedTime"])+render_template("appUsage.html",info=get_data_appUsage(model.select_appUsage,deviceId,20,"packageName",["startTime","elapsedTime"]))
+
 
 
 if __name__ == '__main__':
