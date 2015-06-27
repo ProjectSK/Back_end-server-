@@ -78,7 +78,7 @@ def get_data_appUsage(selector,deviceId,limit, name, infos):
         for info in infos:
             data[info]=str(record[info])
         result.append((data))
-    retVal["yaxisDesc"]="ElapsedTime"
+    retVal["yaxisDesc"]="PackageName"
     retVal["data"]=result
     return retVal
 
@@ -109,7 +109,7 @@ def get_data_loc(deviceId,limit):
 
 @app.route("/location/<deviceId>", methods=["GET"])
 def show_locations(deviceId):
-    return show_columns(model.select_location, deviceId, 20, ["time", "lat", "lng"])+render_template("Location.html",Latlngs=get_data_loc(deviceId,20))
+    return render_template("Location.html",Latlngs=get_data_loc(deviceId,20)) + show_columns(model.select_location, deviceId, 20, ["time", "lat", "lng"])
 
 @app.route("/battery/<deviceId>", methods=["GET"])
 def show_battery(deviceId):

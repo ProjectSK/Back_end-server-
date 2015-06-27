@@ -3,7 +3,15 @@
 <script type="text/javascript" src="http://mbostock.github.com/d3/d3.min.js"></script>
 <style>
 
-body {
+.bar {
+      fill: steelblue;
+}
+
+.bar:hover {
+      fill: brown;
+}
+
+.axis {
       font: 10px sans-serif;
 }
 
@@ -12,10 +20,6 @@ body {
       fill: none;
         stroke: #000;
           shape-rendering: crispEdges;
-}
-
-.bar {
-      fill: steelblue;
 }
 
 .x.axis path {
@@ -29,17 +33,17 @@ body {
 <div id="viz"></div>
 <div id = "test"></div>
 <script type="text/javascript">
-    var margin = {top: 20, right: 80, bottom: 30, left: 50},
-        width = 960 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
+    var margin = {top: 20, right: 80, bottom: 30, left: 300},
+        width = 2000 - margin.left - margin.right,
+        height = 1000 - margin.top - margin.bottom;
 
+    var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 
-    var x = d3.scale.linear()
+    var x = d3.time.scale()
         .range([0, width]);
 
     var y = d3.scale.ordinal()
-
-    var color = d3.scale.category10();
+        .rangeRoundBands([0, height], .1);
 
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -64,11 +68,42 @@ body {
     var yaxisDesc = info.yaxisDesc;
     var data = info.data;
 
-    color.domain(d3.values(data[0])
+    data.forEach(function(d){
+            d.startTime= parseDate(d.startTime);
+            });
 
-    var packNames = d3.keys(data[0]).filter(function(key){return key == "name"});
+     x.domain(d3.extent(data, function(d){return d.startTime;}));
+     y.domain(data.map(function(d) { return d.name; }));
 
-    test.innerHTML = packNames
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+    .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(yaxisDesc);
+
+
+    svg.selectAll(".bar")
+        .data(data)
+    .enter().append("rect")
+        .attr("class", "bar")
+        .attr("y", function(d) { return y(d.name); })
+        .attr("width", y.rangeBand())
+        .attr("x", function(d) { return x(d.startTime); })
+        .attr("width", function(d) { return x(d.elapsedTime/100); });
+
+
+
+
 
 /*
     data.forEach(function(d){

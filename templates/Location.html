@@ -25,7 +25,7 @@ function initialize() {
     var lastloc = new google.maps.LatLng(Number(Latlng[Latlng.length-1].lat),Number(Latlng[Latlng.length-1].lng))
     var mapOptions = {
         center: lastloc,
-        zoom: 6,
+        zoom: 11,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     }
     var map = new google.maps.Map(mapCanvas, mapOptions)
@@ -39,7 +39,7 @@ function initialize() {
                 time: Latlng[i].time
                 });
         google.maps.event.addListener(marker, 'click', function() {
-                    map.setZoom(9)
+                    map.setZoom(14)
                     map.setCenter(marker.getPosition());
                     });
     
