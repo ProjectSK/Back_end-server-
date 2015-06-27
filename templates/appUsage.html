@@ -43,7 +43,7 @@
         .range([0, width]);
 
     var y = d3.scale.ordinal()
-        .rangeRoundBands([0, height], .1);
+        .rangeRoundBands([0, height], .01);
 
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -68,12 +68,23 @@
     var yaxisDesc = info.yaxisDesc;
     var data = info.data;
 
+    var newdata=[]
+
     data.forEach(function(d){
-            d.startTime= parseDate(d.startTime);
+            var oldtime =new Date(d.startTime);
+            var newtime = new Date(oldtime.getTime()+d.elapsedTime*1000);
+            d.startTime = parseDate(d.startTime);
+            d.elapsedTime = newtime;
             });
 
-     x.domain(d3.extent(data, function(d){return d.startTime;}));
-     y.domain(data.map(function(d) { return d.name; }));
+    var obj =d3.max(data,function(d){
+        return d.elapsedTime;
+        });
+    data.push({"name":data[0].name,"startTime":obj,"elapsedTime":obj});
+
+
+    x.domain(d3.extent(data, function(d){return d.startTime;}));
+    y.domain(data.map(function(d) { return d.name; }));
 
     svg.append("g")
         .attr("class", "x axis")
@@ -96,21 +107,15 @@
         .data(data)
     .enter().append("rect")
         .attr("class", "bar")
-        .attr("y", function(d) { return y(d.name); })
-        .attr("width", y.rangeBand())
+        .attr("y", function(d) { return y(d.name)+margin.top+90; })
+        .attr("height", 10)
         .attr("x", function(d) { return x(d.startTime); })
-        .attr("width", function(d) { return x(d.elapsedTime/100); });
+        .attr("width", function(d) { return x(d.elapsedTime)-x(d.startTime); })
 
 
 
 
 
-/*
-    data.forEach(function(d){
-            d.packageName = packNames.map(function(name){ return {name: name, value: +d[name]};});
-            });
-
-*/
 
 
 </script>
