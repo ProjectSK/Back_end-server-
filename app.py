@@ -117,7 +117,7 @@ def show_battery(deviceId):
 
 @app.route("/appUsage/<deviceId>", methods=["GET"])
 def show_appUsage(deviceId):
-    return show_columns(model.select_appUsage, deviceId, 20, ["packageName", "startTime", "elapsedTime"])+render_template("appUsage.html",info=get_data_appUsage(model.select_appUsage,deviceId,20,"packageName",["startTime","elapsedTime"]))
+    return render_template("appUsage.html",info=get_data_appUsage(model.select_appUsage,deviceId,20,"packageName",["startTime","elapsedTime"])) + show_columns(model.select_appUsage, deviceId, 20, ["packageName", "startTime", "elapsedTime"])
 
 
 

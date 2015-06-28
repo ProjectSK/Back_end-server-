@@ -41,6 +41,9 @@ def select_appUsage(cursor, deviceId, limit):
 def select_battery(cursor, deviceId, limit):
     return select_dict(cursor, deviceId, "battery", "time", limit)
 
+def select_memory(cursor, deviceId, limit):
+    return select_dict(cursor,deviceId, "memory", "time",limit)
+
 
 
 def insert_deviceId(cursor, deviceId):
@@ -58,6 +61,10 @@ def insert_battery(cursor, deviceId, battery):
     if "healthType" not in battery:
         print battery
     cursor.execute("INSERT INTO battery (deviceId, time, capacity, level, scale, voltage, temperature, healthType, plugType) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE deviceId = deviceId", (deviceId, battery["time"], battery["capacity"], battery["level"], battery["scale"], battery["voltage"], battery["temperature"], battery["healthType"], battery["plugType"]))
+
+
+#def insert_memory(cursor, deviceId, memory):
+    
 
 
 

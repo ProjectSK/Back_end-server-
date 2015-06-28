@@ -2,7 +2,7 @@
 <head>
 <script type="text/javascript" src="http://mbostock.github.com/d3/d3.min.js"></script>
 <style>
-
+/*
 .bar {
       fill: steelblue;
 }
@@ -10,7 +10,7 @@
 .bar:hover {
       fill: brown;
 }
-
+*/
 .axis {
       font: 10px sans-serif;
 }
@@ -53,6 +53,8 @@
         .scale(y)
         .orient("left");
 
+    var color = d3.scale.category10();
+
     var svg = d3.select("#viz").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
@@ -68,11 +70,10 @@
     var yaxisDesc = info.yaxisDesc;
     var data = info.data;
 
-    var newdata=[]
 
     data.forEach(function(d){
             var oldtime =new Date(d.startTime);
-            var newtime = new Date(oldtime.getTime()+d.elapsedTime*1000);
+            var newtime = new Date(oldtime.getTime()+Number(d.elapsedTime));
             d.startTime = parseDate(d.startTime);
             d.elapsedTime = newtime;
             });
@@ -81,6 +82,17 @@
         return d.elapsedTime;
         });
     data.push({"name":data[0].name,"startTime":obj,"elapsedTime":obj});
+    
+    var packageName = data.map(function(obj){
+            return obj.name;
+            });
+
+    var unique = packageName.filter(function(elem, index, self) {
+                return index == self.indexOf(elem);
+                })
+
+    color.domain(unique);
+
 
 
     x.domain(d3.extent(data, function(d){return d.startTime;}));
@@ -110,8 +122,8 @@
         .attr("y", function(d) { return y(d.name)+margin.top; })
         .attr("height", 10)
         .attr("x", function(d) { return x(d.startTime); })
-        .attr("width", function(d) { return x(d.elapsedTime)-x(d.startTime)+margin.left; })
-
+        .attr("width", function(d) { if(x(d.elapsedTime)!==x(d.startTime)) return x(d.elapsedTime)-x(d.startTime) })
+        .style("fill", function(d){ return color(d.name);});
 
 
 
