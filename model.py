@@ -9,7 +9,11 @@ CREATE TABLE IF NOT EXISTS appUsage ( deviceId VARCHAR(100) NOT NULL, startTime 
 '''
 CREATE TABLE IF NOT EXISTS battery ( deviceId VARCHAR(100) NOT NULL, time DATETIME, capacity INT, level INT, scale INT, voltage INT, temperature FLOAT, healthType TEXT, plugType TEXT, PRIMARY KEY (deviceId, time))''',
 '''
-CREATE TABLE IF NOT EXISTS location (deviceId VARCHAR(100) NOT NULL, time DATETIME, lat FLOAT, lng FLOAT, PRIMARY KEY (deviceId, time));
+CREATE TABLE IF NOT EXISTS location (deviceId VARCHAR(100) NOT NULL, time DATETIME, lat FLOAT, lng FLOAT, PRIMARY KEY (deviceId, time))''',
+'''
+CREATE TABLE IF NOT EXISTS memory (deviceId VARCHAR(100) NOT NULL, time DATETIME, percentageUsage INT, totalMemory INT, freeMemory INT, PRIMARY KEY (deviceId, time))''',
+'''
+CREATE TABLE IF NOT EXISTS cpu (deviceId VARCHAR(100) NOT NULL, time DATETIME, user INT, system INT, idle INT, other INT, PRIMARY KEY (deviceId, time))
 ''']
 def ensure_tables(db):
     for sql in TABLE_CREATIONS:
@@ -41,6 +45,11 @@ def select_appUsage(cursor, deviceId, limit):
 def select_battery(cursor, deviceId, limit):
     return select_dict(cursor, deviceId, "battery", "time", limit)
 
+def select_memory(cursor, deviceId, limit):
+    return select_dict(cursor,deviceId, "memory", "time",limit)
+
+def select_cpu(cursor, deviceId, limit):
+    return select_dict(cursor,deviceId, "cpu", "time",limit)
 
 
 def insert_deviceId(cursor, deviceId):
@@ -58,6 +67,14 @@ def insert_battery(cursor, deviceId, battery):
     if "healthType" not in battery:
         print battery
     cursor.execute("INSERT INTO battery (deviceId, time, capacity, level, scale, voltage, temperature, healthType, plugType) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE deviceId = deviceId", (deviceId, battery["time"], battery["capacity"], battery["level"], battery["scale"], battery["voltage"], battery["temperature"], battery["healthType"], battery["plugType"]))
+
+
+def insert_memory(cursor, deviceId, memory):
+    cursor.execute("INSERT INTO memory (deviceId, time, percentageUsage, totalMemory, freeMemory) VALUES(%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE deviceId = deviceId", (deviceId, memory["time"], memory["percentageOfMemoryUsage"], memory["totalMemory"], memory["freeMemory"]))
+
+def insert_cpu(cursor, deviceId, cpu):
+    cursor.execute("INSERT INTO cpu (deviceId, time, user, system, idle, other) VALUES(%s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE deviceId = deviceId", (deviceId, cpu["time"], cpu["user"], cpu["system"], cpu["idle"], cpu["other"]))
+    
 
 
 
