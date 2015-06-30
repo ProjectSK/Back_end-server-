@@ -52,6 +52,11 @@ def post_memory():
 def post_cpu():
     return do_post(model.insert_cpu)
 
+@app.route('/data', methods=["POST"])
+def post_data():
+    return do_post(model.insert_data)
+
+
 
 
 def show_columns(selector, deviceId, limit, mand_cols):
@@ -154,6 +159,23 @@ def show_cpu(deviceId):
     retVal["yaxisDesc"]="Percentage(%)"
     retVal["data"]=result
     return render_template("cpu.html",info=retVal)+show_columns(model.select_cpu, deviceId, limit, ["time","user","system","idle","other"]);
+
+@app.route("/data/<deviceId>", methods=["GET"])
+def show_data(deviceId):
+    c=db.cursor()
+    retVal={}
+    result=[]
+    limit=20
+    for record in model.select_data(c,deviceId,limit):
+        data={}
+        data["date"]=str(record["time"])
+        for info in ["transdata", "recdata"]:
+            data[info]=str(record[info])
+        result.append((data))
+    retVal["yaxisDesc"]="DATA"
+    retVal["data"]=result
+    return render_template("data.html",info=retVal)+show_columns(model.select_data, deviceId, limit, ["time","transdata","recdata","elapsedTime"]);
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
