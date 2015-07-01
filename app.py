@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+
+#main code for server.
+#
+#do actual visualization and get calls for getting info from client
+#
+#
+
 import MySQLdb
 import MySQLdb.cursors
 import model
@@ -19,6 +26,7 @@ def index():
     return "<h2> List of Device Ids </h2>" + "".join(["<h3>%s</h3>"%x for x in model.select_deviceId(db.cursor())])
 
 
+#get info from client apps
 def do_post(inserter):
     deviceId = request.json["deviceId"]
     data = request.json["data"]
@@ -31,6 +39,8 @@ def do_post(inserter):
     db.commit()
 
     return "OK"
+
+#function for each data
 
 @app.route("/location", methods=["POST"])
 def post_location():
@@ -59,6 +69,7 @@ def post_data():
 
 
 
+#draw table of each data
 def show_columns(selector, deviceId, limit, mand_cols):
     c = db.cursor()
     result = []
@@ -82,6 +93,8 @@ def show_columns(selector, deviceId, limit, mand_cols):
     result.append("</div>")
     return "".join(result)
 
+
+#functinos for drawing visualization(graph + table) each function has grph visualization part
 
 @app.route("/location/<deviceId>", methods=["GET"])
 def show_locations(deviceId):
