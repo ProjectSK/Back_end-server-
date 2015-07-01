@@ -1,8 +1,12 @@
+#code for MySQL DB setup/read/write
+
 #!/usr/bin/env python
 import MySQLdb
 import MySQLdb.cursors
 import config
 
+
+#create table if not exists
 TABLE_CREATIONS = ['''CREATE TABLE IF NOT EXISTS user ( deviceId VARCHAR(100) NOT NULL PRIMARY KEY)''',
 '''
 CREATE TABLE IF NOT EXISTS appUsage ( deviceId VARCHAR(100) NOT NULL, startTime DATETIME NOT NULL, elapsedTime INT NOT NULL, packageName VARCHAR(100) NOT NULL, PRIMARY KEY (deviceId, startTime, packageName) )''',
@@ -23,6 +27,7 @@ def ensure_tables(db):
         c.execute(sql)
         db.commit()
 
+
 def select_deviceId(cursor):
     cursor.execute("SELECT * FROM user LIMIT 10")
     row = cursor.fetchone()
@@ -30,7 +35,7 @@ def select_deviceId(cursor):
         yield row["deviceId"]
         row = cursor.fetchone()
 
-
+#get data form MySQL db
 def select_dict(cursor, deviceId, table, date_field, limit):
     cursor.execute("SELECT * FROM %s WHERE deviceId = '%s' ORDER BY %s DESC LIMIT %d"%(table, deviceId, date_field, limit))
     row = cursor.fetchone()
@@ -38,6 +43,7 @@ def select_dict(cursor, deviceId, table, date_field, limit):
         yield row
         row = cursor.fetchone()
 
+#functions for each data
 def select_location(cursor, deviceId, limit):
     return select_dict(cursor, deviceId, "location", "time", limit)
 
@@ -57,6 +63,8 @@ def select_data(cursor, deviceId, limit):
     return select_dict(cursor,deviceId, "data", "time",limit)
 
 
+
+#insert datas into MySQL DB
 def insert_deviceId(cursor, deviceId):
     cursor.execute("INSERT IGNORE INTO user VALUES (%s)", (deviceId, ))
 
