@@ -23,7 +23,26 @@ db = MySQLdb.connect(user=config.DATABASE_USERNAME,
 
 @app.route("/")
 def index():
-    return "<h2> List of Device Ids </h2>" + "".join(["<h3>%s</h3>"%x for x in model.select_deviceId(db.cursor())])
+    result = []
+    result.append("<div id='idlist'>");
+    result.append("<h2> List of registered deviceIds </h2>");
+    for devid in model.select_deviceId(db.cursor()):
+        result.append("<p>")
+        result.append("<h3>")
+        result.append(devid)
+        result.append("</h3>")
+        for infoname in ["appUsage", "battery", "cpu", "data", "location", "memory"]:
+            result.append("<a href='http://52.11.1.59:8080/");
+            result.append(infoname);
+            result.append("/");
+            result.append(devid);
+            result.append("' target='_blank'>");
+            result.append(infoname);
+            result.append("</a>");
+            result.append("&nbsp; ");
+        result.append("</p>");
+    return "".join(result)
+
 
 
 #get info from client apps
